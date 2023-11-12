@@ -1,0 +1,16 @@
+[package]
+name = "rs-screen-translate"
+version = "0.1.0"
+edition = "2021"
+
+[profile.release]
+opt-level = 3
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-web = "4.4.0"
+actix-files = "0.6.2"
+scrap = "0.5.0"
+image = "0.24.7"
+tera = "1.19.1"
