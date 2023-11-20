@@ -11,13 +11,20 @@ async fn index(data: Data<AppData>) -> impl Responder {
 }
 
 #[get("/frames")]
-async fn frames(data: Data<AppData>) -> impl Responder {
-    HttpResponse::Ok().content_type("image/png")
-        .body(data.frame.take())
+async fn get_frames(data: Data<AppData>) -> impl Responder {
+    let frames = data.frames.lock().unwrap();
+    HttpResponse::Ok().body(frames.last().unwrap().clone())
+}
+
+#[get("/last")]
+async fn last(data: Data<AppData>) -> impl Responder {
+    let frames = data.frames.lock().unwrap();
+    HttpResponse::Ok().content_type("image/png").body(frames.last().unwrap().clone())
 }
 
 pub fn get_scope() -> Scope {
     Scope::new("")
         .service(index)
-        .service(frames)
+        .service(get_frames)
+        .service(last)
 }

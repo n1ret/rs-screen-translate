@@ -1,16 +1,16 @@
 use tera::Tera;
-use std::cell::Cell;
+use std::sync::Mutex;
 
 pub struct AppData {
     pub tera: Tera,
-    pub frame: Cell<Vec<u8>>
+    pub frames: Mutex<Vec<String>>
 }
 
 impl AppData {
     pub fn new(tera: Tera) -> AppData {
         AppData {
             tera,
-            frame: Cell::new(vec![])
+            frames: Mutex::new(vec![])
         }
     }
 }

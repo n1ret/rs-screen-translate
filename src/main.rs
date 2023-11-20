@@ -12,17 +12,18 @@ use crate::capture::start_capture;
 
 #[actix_web::main]
 async fn main() {
-    let _ = HttpServer::new(|| {
-        let templates = Tera::new("templates/**/*").unwrap();
-        let data = AppData::new(templates);
+    let tera = Tera::new("templates/**/*").unwrap();
+    let data = Data::new(AppData::new(tera));
+    let capturing = spawn(start_capture(data.clone()));
 
-        //let _ = spawn(start_capture(&data));
-
+    let _ = HttpServer::new(move || {
         App::new()
-            .app_data(data)
-            .service(fs::Files::new("/static", "static/"))
-            .service(get_scope())
+        .app_data(Data::clone(&data))
+        .service(fs::Files::new("/static", "static/"))
+        .service(get_scope())
     })
     .bind(("0.0.0.0", 8080)).unwrap()
     .run().await;
+
+    capturing.abort();
 }
