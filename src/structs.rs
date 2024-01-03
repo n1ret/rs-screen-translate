@@ -1,16 +1,16 @@
 use tera::Tera;
-use std::sync::Mutex;
+use std::sync::RwLock;
 
 pub struct AppData {
     pub tera: Tera,
-    pub frames: Mutex<Vec<String>>
+    pub frames: RwLock<Vec<String>>
 }
 
 impl AppData {
     pub fn new(tera: Tera) -> AppData {
         AppData {
             tera,
-            frames: Mutex::new(vec![])
+            frames: RwLock::new(vec![])
         }
     }
 }

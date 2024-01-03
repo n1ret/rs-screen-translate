@@ -1,8 +1,9 @@
-let frames = [];
+const FPS = 10;
 
-$.get("/frames", data,
-    function (data) {
-        
-    },
-    "dataType"
-);
+setInterval(function() {
+    $.get("last",
+        function (data) {
+            $(".frame").attr("src", "data:image/png;base64,"+data);
+        }
+    );
+}, 1000/FPS);

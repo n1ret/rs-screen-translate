@@ -2,7 +2,10 @@ mod capture;
 mod routes;
 mod structs;
 
-use actix_web::{HttpServer, App, web::Data, rt::spawn};
+use std::thread::spawn;
+use std::sync::mpsc;
+
+use actix_web::{HttpServer, App, web::Data};
 use actix_files as fs;
 use tera::Tera;
 
@@ -14,16 +17,19 @@ use crate::capture::start_capture;
 async fn main() {
     let tera = Tera::new("templates/**/*").unwrap();
     let data = Data::new(AppData::new(tera));
-    let capturing = spawn(start_capture(data.clone()));
 
+    let (tx, rx) = mpsc::channel::<()>();
+    let data_clone = data.clone();
+    spawn(|| start_capture(data_clone, rx));
+    
     let _ = HttpServer::new(move || {
         App::new()
-        .app_data(Data::clone(&data))
+        .app_data(data.clone())
         .service(fs::Files::new("/static", "static/"))
         .service(get_scope())
     })
     .bind(("0.0.0.0", 8080)).unwrap()
     .run().await;
 
-    capturing.abort();
+    tx.send(()).unwrap();
 }
